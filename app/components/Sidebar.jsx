@@ -1,62 +1,53 @@
-import Image from "next/image";
-import trending from "@/public/trending.svg";
-import newRelease from "@/public/newRelease.svg";
-import commingSoon from "@/public/commingSoon.svg";
-import favourite from "@/public/favourite.svg";
-import watchLater from "@/public/watchLater.svg";
 import { getDictionary } from "../[lang]/dictionaries";
 
-const Sidebar = async ({ lang }) => {
+const NAV_ITEMS = [
+  { key: "trending", icon: "↑", href: "#" },
+  { key: "newReleases", icon: "★", href: "#" },
+  { key: "comingSoon", icon: "◷", href: "#" },
+  { key: "favorites", icon: "♡", href: "#" },
+  { key: "watchLater", icon: "⊕", href: "#" },
+];
+
+const Sidebar = async ({ lang, activeKey = "trending" }) => {
   const dictionary = await getDictionary(lang);
+
   return (
-    <aside>
-      <ul className="space-y-2">
-        <li>
-          <a
-            className="flex items-center space-x-2 px-5 py-3.5 rounded-lg bg-primary text-black"
-            href="#"
-          >
-            <Image src={trending} width="24" height="24" alt="" />
-            <span>{dictionary.trending}</span>
-          </a>
-        </li>
-        <li>
-          <a
-            className="flex items-center space-x-2 px-5 py-3.5 rounded-lg"
-            href="#"
-          >
-            <Image src={newRelease} width="24" height="24" alt="" />
-            <span>{dictionary.newReleases}</span>
-          </a>
-        </li>
-        <li>
-          <a
-            className="flex items-center space-x-2 px-5 py-3.5 rounded-lg"
-            href="#"
-          >
-            <Image src={commingSoon} width="24" height="24" alt="" />
-            <span>{dictionary.comingSoon}</span>
-          </a>
-        </li>
-        <li>
-          <a
-            className="flex items-center space-x-2 px-5 py-3.5 rounded-lg"
-            href="#"
-          >
-            <Image src={favourite} width="24" height="24" alt="" />
-            <span>{dictionary.favorites}</span>
-          </a>
-        </li>
-        <li>
-          <a
-            className="flex items-center space-x-2 px-5 py-3.5 rounded-lg"
-            href="#"
-          >
-            <Image src={watchLater} width="24" height="24" alt="" />
-            <span>{dictionary.watchLater}</span>
-          </a>
-        </li>
-      </ul>
+    <aside className="pt-2 pr-4">
+      <nav>
+        <ul className="space-y-1">
+          {NAV_ITEMS.map(({ key, icon, href }) => {
+            const isActive = key === activeKey;
+            return (
+              <li key={key}>
+                <a
+                  href={href}
+                  className={`
+                    flex items-center gap-3
+                    px-4 py-3 rounded-lg
+                    text-sm font-medium
+                    border transition-all duration-200
+                    ${
+                      isActive
+                        ? "bg-[#C9A84C]/10 border-[#C9A84C]/30 text-[#C9A84C]"
+                        : "border-transparent text-[#9B978D] hover:bg-[#18181C] hover:text-[#F0EDE6]"
+                    }
+                  `}
+                >
+                  <span
+                    className={`
+                      w-4 shrink-0 text-center text-sm leading-none select-none
+                      ${isActive ? "text-[#C9A84C]" : "text-[#5A574F]"}
+                    `}
+                  >
+                    {icon}
+                  </span>
+                  <span>{dictionary[key]}</span>
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
     </aside>
   );
 };

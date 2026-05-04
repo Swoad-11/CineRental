@@ -2,12 +2,18 @@ import Image from "next/image";
 import { getMovieById } from "../[lang]/movies";
 import { getDictionary } from "../[lang]/dictionaries";
 
+const StatChip = ({ label, value }) => (
+  <div className="flex-1 rounded-lg border border-white/6 bg-[#18181C] px-3 py-2.5">
+    <span className="block text-[9px] tracking-[0.1em] uppercase text-[#5A574F] mb-1">
+      {label}
+    </span>
+    <span className="text-sm font-medium text-[#C9A84C]">{value}</span>
+  </div>
+);
+
 const MovieDetails = async ({ id, lang }) => {
   const movie = await getMovieById(id);
-
-  if (!movie) {
-    return;
-  }
+  if (!movie) return null;
 
   const {
     poster_path,
@@ -22,52 +28,87 @@ const MovieDetails = async ({ id, lang }) => {
   const dictionary = await getDictionary(lang);
 
   return (
-    <section>
-      <div>
+    <article>
+      {/* ── Hero banner — uses the poster centered so subject is always visible ── */}
+      <div className="relative h-56 sm:h-72 w-full overflow-hidden">
         <Image
-          className="object-cover"
-          width={0}
-          height={300}
           src={poster_path}
-          sizes="100vw"
-          style={{ width: "100%" }}
-          alt="poster"
+          fill
+          className="object-cover object-center brightness-[0.4]"
+          alt=""
+          aria-hidden
         />
+        {/* Bottom fade into content */}
+        <div className="absolute bottom-0 inset-x-0 h-28 bg-gradient-to-t from-[#111114] to-transparent" />
+        {/* Left fade so poster thumb doesn't clash */}
+        <div className="absolute inset-y-0 left-0 w-48 bg-gradient-to-r from-[#111114]/60 to-transparent" />
       </div>
 
-      <div className="grid grid-cols-12 py-12 gap-8">
-        <div className="col-span-2">
-          <Image
-            src={poster_path}
-            width={0}
-            height={0}
-            sizes="100vw"
-            style={{ width: "auto", height: "auto" }}
-            alt=""
-          />
+      {/* ── Content ── */}
+      <div className="px-6 pb-8">
+        {/* Poster overlapping hero */}
+        <div className="flex gap-5 -mt-20 relative z-10 items-end mb-5">
+          <div className="w-24 sm:w-28 shrink-0 rounded-lg overflow-hidden border border-[#C9A84C]/25 shadow-[0_8px_32px_rgba(0,0,0,0.7)]">
+            <Image
+              src={poster_path}
+              width={112}
+              height={168}
+              style={{ width: "100%", height: "auto" }}
+              alt={title}
+              className="object-cover block"
+            />
+          </div>
+
+          {/* Title block */}
+          <div className="flex-1 min-w-0 pb-1">
+            <h2 className="font-playfair text-xl sm:text-2xl font-bold text-[#F0EDE6] leading-tight mb-1">
+              {title}
+            </h2>
+            <p className="text-[10px] tracking-widest uppercase text-[#5A574F]">
+              Released {release_date}
+            </p>
+          </div>
         </div>
-        <div className="col-span-8">
-          <h2 className="font-bold text-slate-500 dark:text-slate-300 text-2xl">
-            {title}
-          </h2>
-          <p className="my-2 text-slate-400  italic">{overview}</p>
-          <ul className="text-slate-500 dark:text-slate-300 space-y-2 my-8">
-            <li>Release Date : {release_date}</li>
-            <li>Average Vote : {vote_average}</li>
-            <li>Vote Count : {vote_count}</li>
-            <li>Popularity : {popularity}</li>
-          </ul>
+        <div className="flex gap-4 items-start">
+          {/* Stats */}
+          <div className="flex gap-2 flex-1 min-w-0">
+            <StatChip label="Avg. Vote" value={`${vote_average} / 10`} />
+            <StatChip label="Votes" value={vote_count.toLocaleString()} />
+            <StatChip label="Popularity" value={popularity.toFixed(1)} />
+            <StatChip label="Year" value={release_date?.slice(0, 4) ?? "—"} />
+          </div>
         </div>
-        <div className="col-span-2 space-y-4">
-          <button className="py-2 w-full bg-primary font-medium text-slate-800 rounded-md">
-            {dictionary.streamInHD}
+
+        {/* Overview */}
+        <p className="text-sm text-[#9B978D] italic leading-relaxed mb-5">
+          {overview}
+        </p>
+        {/* Stats + buttons side by side */}
+        <div className="flex gap-4 shrink-0 pb-1">
+          <button
+            className="
+              h-10 px-5 rounded-lg whitespace-nowrap
+              bg-[#C9A84C] border border-[#C9A84C]
+              text-[#0A0A0B] text-[11px] font-bold tracking-widest uppercase
+              hover:bg-[#B8963C] transition-colors duration-200
+            "
+          >
+            ▶ {dictionary.streamInHD}
           </button>
-          <button className="py-2 w-full bg-primary font-medium text-slate-800 rounded-md">
-            {dictionary.downloadInHD}
+          <button
+            className="
+              h-10 px-5 rounded-lg whitespace-nowrap
+              bg-transparent border border-white/12
+              text-[#9B978D] text-[11px] font-medium tracking-widest uppercase
+              hover:border-[#C9A84C]/40 hover:text-[#C9A84C]
+              transition-all duration-200
+            "
+          >
+            ↓ {dictionary.downloadInHD}
           </button>
         </div>
       </div>
-    </section>
+    </article>
   );
 };
 

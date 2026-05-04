@@ -1,14 +1,18 @@
-import React from "react";
 import MovieCard from "./MovieCard";
 
 export default function MovieList({ movies, lang }) {
   return (
-    <div className="content">
-      <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-7">
+    <section>
+      <div
+        className="
+          grid gap-5
+          grid-cols-1 sm:grid-cols-2 xl:grid-cols-3
+        "
+      >
         {movies.map((movie) => (
           <MovieCard key={movie.id} movie={movie} lang={lang} />
         ))}
       </div>
-    </div>
+    </section>
   );
 }
