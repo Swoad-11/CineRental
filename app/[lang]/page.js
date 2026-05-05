@@ -1,6 +1,6 @@
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
-import MobileMenu from "../components/MobileSidebar";
+import MobileSidebar from "../components/MobileSidebar";
 import Footer from "../components/Footer";
 import MovieList from "../components/MovieList";
 import { getAllMovies } from "./movies";
@@ -8,19 +8,15 @@ import { getDictionary } from "./dictionaries";
 
 const Home = async ({ params: { lang }, searchParams }) => {
   const dictionary = await getDictionary(lang);
-
-  // Read the filter from the URL (?filter=trending), default to "trending"
   const filter = searchParams?.filter ?? "trending";
-
-  // Pass filter to getAllMovies so it hits the correct TMDB endpoint
   const movies = await getAllMovies(filter);
 
   return (
     <>
-      <Navbar mobileTrigger={<MobileMenu dictionary={dictionary} />} />
+      <Navbar mobileTrigger={<MobileSidebar dictionary={dictionary} />} />
 
       <main className="flex min-h-[calc(100vh-4rem)]">
-        {/* Desktop sidebar — receives searchParams so it can compute activeFilter */}
+        {/* Desktop sidebar */}
         <div className="hidden lg:block w-[218px] shrink-0 border-r border-white/6 pl-6 pr-2 pt-8">
           <Sidebar lang={lang} searchParams={searchParams} />
         </div>
