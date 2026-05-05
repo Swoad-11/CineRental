@@ -1,22 +1,15 @@
-import Navbar from "../../components/Navbar";
-import Footer from "../../components/Footer";
-import MobileSidebar from "../../components/MobileSidebar";
 import Modal from "../../components/Modal";
 import MovieDetails from "../../components/MovieDetails";
 import { getDictionary } from "../dictionaries";
 
-const MoviePage = async ({ params: { lang, id } }) => {
+const MovieModal = async ({ params: { lang, id } }) => {
   const dictionary = await getDictionary(lang);
 
   return (
-    <>
-      <Navbar mobileTrigger={<MobileSidebar dictionary={dictionary} />} />
-      <Modal>
-        <MovieDetails id={id} lang={lang} />
-      </Modal>
-      <Footer />
-    </>
+    <Modal>
+      <MovieDetails id={id} lang={lang} />
+    </Modal>
   );
 };
 
-export default MoviePage;
+export default MovieModal;
