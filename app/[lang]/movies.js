@@ -1,14 +1,12 @@
 import "server-only";
-
-const movies = () =>
-  import("./moviedb/movie.json").then((module) => module.default);
+import { movieList } from "../data/data"; // Make sure path is correct
 
 export const getAllMovies = async () => {
-  const moviesData = await movies();
-  return moviesData.movies;
+  const movies = await movieList();
+  return movies;
 };
 
 export const getMovieById = async (id) => {
-  const moviesData = await movies();
-  return moviesData.movies.find((movie) => movie.id == id);
+  const movies = await movieList();
+  return movies.find((movie) => movie.id == id);
 };

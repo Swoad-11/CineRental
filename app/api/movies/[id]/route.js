@@ -17,7 +17,7 @@ export async function PATCH(request, { params }) {
   const movie = await request.json();
   const movieId = params.id;
   const movieIndex = movieList.results.findIndex(
-    (movie) => movie.id === movieId
+    (movie) => movie.id === movieId,
   );
   if (movieIndex !== -1) {
     movieList.results[movieIndex].title = movie.title;
@@ -30,7 +30,7 @@ export async function PATCH(request, { params }) {
 export async function DELETE(request, { params }) {
   const movieId = params.id;
   const movieIndex = movieList.results.findIndex(
-    (movie) => movie.id === movieId
+    (movie) => movie.id === movieId,
   );
   if (movieIndex !== -1) {
     const movieToDelete = movieList.results[movieIndex];

@@ -32,13 +32,16 @@ const StarRating = ({ rating }) => {
 
 const MovieCard = async ({ movie, lang }) => {
   const dictionary = await getDictionary(lang);
-  const { title, vote_average, poster_path, genre_ids, id } = movie;
+  const { title, vote_average, backdrop_path, genre_ids, id } = movie;
 
   const rating = vote_average / 2;
   const genres = genre_ids
     .map((gid) => genreMapping[gid])
     .filter(Boolean)
     .join(" / ");
+
+  // TMDB Image Base URL (w500 is a good size for cards)
+  const imageUrl = `https://image.tmdb.org/t/p/w500${backdrop_path}`;
 
   return (
     <figure
@@ -51,15 +54,16 @@ const MovieCard = async ({ movie, lang }) => {
       "
     >
       {/* Poster */}
-      <div className="relative overflow-hidden">
+      <div className="relative overflow-hidden aspect-video">
         <Image
-          className="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-105"
-          width={0}
-          height={0}
-          src={poster_path}
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+          width={500}
+          height={281}
+          src={imageUrl}
           sizes="(max-width: 768px) 100vw, 33vw"
-          style={{ width: "100%", height: "auto" }}
           alt={title}
+          // Important: Add unoptimized if you haven't configured remotePatterns in next.config.mjs
+          // unoptimized
         />
         {/* Bottom fade */}
         <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-[#18181C] to-transparent" />
@@ -75,7 +79,7 @@ const MovieCard = async ({ movie, lang }) => {
             text-[#C9A84C] text-[11px] font-medium
           "
         >
-          ★ {(vote_average / 2).toFixed(1)}
+          ★ {rating.toFixed(1)}
         </div>
       </div>
 
@@ -83,20 +87,20 @@ const MovieCard = async ({ movie, lang }) => {
       <figcaption className="flex flex-col gap-2 p-4 pt-3">
         {/* Genre */}
         <p className="text-[10px] tracking-[0.15em] uppercase text-[#5A574F]">
-          {genres}
+          {genres || "Movie"}
         </p>
 
         {/* Title */}
-        <h3 className="font-playfair text-base font-semibold text-[#F0EDE6] leading-snug line-clamp-2">
+        <h3 className="font-playfair text-base font-semibold text-[#F0EDE6] leading-snug line-clamp-2 min-h-[2.5rem]">
           {title}
         </h3>
 
         {/* Stars */}
         <StarRating rating={rating} />
 
-        {/* CTA */}
+        {/* CTA - Now includes the dynamic lang */}
         <Link
-          href={`/movies/${id}`}
+          href={`/${lang}/movies/${id}`}
           className="
             mt-1 flex items-center justify-center gap-1.5
             h-9 rounded-lg
@@ -107,7 +111,7 @@ const MovieCard = async ({ movie, lang }) => {
           "
         >
           <span>▶</span>
-          <span>{dictionary.details}</span>
+          <span>{dictionary.details || "Details"}</span>
         </Link>
       </figcaption>
     </figure>

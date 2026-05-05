@@ -1,20 +1,20 @@
 "use client";
 
-import { ThemeProvider } from "next-themes";
 import { useState, useEffect } from "react";
 
 const Provider = ({ children }) => {
   const [mounted, setMounted] = useState(false);
 
-  useEffect(() => setMounted(true), []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
-  if (!mounted) return <>{children}</>;
+  // Standard practice to prevent hydration mismatch
+  if (!mounted) {
+    return <>{children}</>;
+  }
 
-  return (
-    <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-      {children}
-    </ThemeProvider>
-  );
+  return <div className="dark">{children}</div>;
 };
 
 export default Provider;
