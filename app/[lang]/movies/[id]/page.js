@@ -1,10 +1,10 @@
-import Navbar from "../components/Navbar";
-import Sidebar from "../components/Sidebar";
-import MobileMenu from "../components/MobileMenu";
-import Footer from "../components/Footer";
-import { getAllMovies } from "./movies";
-import MovieList from "../components/MovieList";
-import { getDictionary } from "./dictionaries";
+import Navbar from "../../components/Navbar";
+import Sidebar from "../../components/Sidebar";
+import MobileMenu from "../../components/MobileSidebar";
+import Footer from "../../components/Footer";
+import MovieList from "../../components/MovieList";
+import { getAllMovies } from "../movies";
+import { getDictionary } from "../dictionaries";
 
 const Home = async ({ params: { lang }, searchParams }) => {
   const dictionary = await getDictionary(lang);
