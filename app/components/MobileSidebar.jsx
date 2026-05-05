@@ -1,17 +1,21 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useTheme } from "next-themes";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import logo from "/public/logo.svg";
 
 const NAV_ITEMS = [
-  { key: "trending", icon: "↑", label: "Trending" },
-  { key: "newReleases", icon: "★", label: "New Releases" },
-  { key: "comingSoon", icon: "◷", label: "Coming Soon" },
-  { key: "favorites", icon: "♡", label: "Favorites" },
-  { key: "watchLater", icon: "⊕", label: "Watch Later" },
+  { key: "trending", icon: "↑", label: "Trending", filter: "trending" },
+  {
+    key: "newReleases",
+    icon: "★",
+    label: "New Releases",
+    filter: "new-releases",
+  },
+  { key: "comingSoon", icon: "◷", label: "Coming Soon", filter: "coming-soon" },
+  { key: "topRated", icon: "♛", label: "Top Rated", filter: "top-rated" },
+  { key: "popular", icon: "♟", label: "Popular", filter: "popular" },
 ];
 
 const LANGUAGES = [
@@ -19,44 +23,60 @@ const LANGUAGES = [
   { code: "bn", label: "বাং" },
 ];
 
-const MobileMenu = ({ dictionary, activeKey = "trending" }) => {
+const MobileMenu = ({ dictionary }) => {
   const [open, setOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
-  const { resolvedTheme, setTheme } = useTheme();
+
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
 
-  useEffect(() => setMounted(true), []);
+  const activeFilter = searchParams.get("filter") ?? "trending";
+  const activeLang =
+    LANGUAGES.find((l) => pathname.startsWith(`/${l.code}`))?.code ?? "en";
 
-  // Lock scroll when menu is open
   useEffect(() => {
-    if (open) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "auto";
-    }
+    document.body.style.overflow = open ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
   }, [open]);
 
-  const isDark = resolvedTheme === "dark";
+  useEffect(() => {
+    const handler = (e) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, []);
+
+  const handleFilter = (filter) => {
+    router.push(`/${activeLang}?filter=${filter}`);
+    setOpen(false);
+  };
+
+  const handleLang = (code) => {
+    const filter = searchParams.get("filter") ?? "trending";
+    router.push(`/${code}?filter=${filter}`);
+    setOpen(false);
+  };
 
   return (
     <>
-      {/* ── Hamburger button ── */}
+      {/* Hamburger */}
       <button
         onClick={() => setOpen(true)}
         aria-label="Open menu"
         className="
-    lg:hidden
-    flex items-center justify-center
-    w-11 h-11 rounded-xl
-    border border-[#C9A84C]/30 bg-[#18181C]
-    text-[#C9A84C] hover:bg-[#C9A84C]/10
-    transition-all duration-300 active:scale-95
-  "
+          lg:hidden flex items-center justify-center
+          w-10 h-10 rounded-xl
+          border border-[#C9A84C]/30 bg-[#18181C]
+          text-[#C9A84C] hover:bg-[#C9A84C]/10
+          transition-all duration-200 active:scale-95
+        "
       >
         <svg
-          width="24"
-          height="24"
+          width="18"
+          height="18"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -70,73 +90,109 @@ const MobileMenu = ({ dictionary, activeKey = "trending" }) => {
         </svg>
       </button>
 
-      {/* ── Backdrop (Higher z-index) ── */}
+      {/* Backdrop */}
       <div
         onClick={() => setOpen(false)}
         className={`
-          fixed inset-0 z-[9998] bg-black/90 backdrop-blur-md lg:hidden
-          transition-opacity duration-300 ease-in-out
-          ${open ? "opacity-100 visible" : "opacity-0 invisible"}
+          fixed inset-0 z-[9998] bg-black/80 backdrop-blur-sm lg:hidden
+          transition-opacity duration-300
+          ${open ? "opacity-100 visible" : "opacity-0 invisible pointer-events-none"}
         `}
       />
 
-      {/* ── Drawer (The Fixed Part) ── */}
+      {/* Drawer */}
       <aside
-        style={{
-          backgroundColor: "#111114",
-          boxShadow: "-10px 0 50px rgba(0,0,0,1)",
-          visibility: open ? "visible" : "hidden",
-          height: "100vh", // Force full viewport height
-          position: "fixed", // Ensure it ignores parent height
-          top: 0,
-          right: 0,
-        }}
         className={`
-    fixed top-0 right-0 z-[9999]
-    w-[280px]
-    flex flex-col
-    transition-transform duration-300 ease-in-out
-    lg:hidden
-    ${open ? "translate-x-0" : "translate-x-full"}
-  `}
+          fixed top-0 right-0 z-[9999]
+          w-[280px] h-screen flex flex-col
+          bg-[#111114] border-l border-[#C9A84C]/10
+          shadow-[-20px_0_60px_rgba(0,0,0,0.8)]
+          transition-transform duration-300 ease-in-out
+          lg:hidden
+          ${open ? "translate-x-0" : "translate-x-full"}
+        `}
       >
-        {/* Drawer Header */}
-        <div className="flex items-center justify-between px-5 h-20 border-b border-white/5 bg-[#111114]">
-          <Image src={logo} width={120} height={24} alt="Logo" priority />
+        {/* Gold top accent */}
+        <div className="h-0.5 w-full bg-gradient-to-r from-transparent via-[#C9A84C] to-transparent shrink-0" />
+
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 h-16 border-b border-white/6 shrink-0">
+          <Image src={logo} width={110} height={22} alt="Logo" priority />
           <button
             onClick={() => setOpen(false)}
-            className="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 text-white text-xl"
+            aria-label="Close menu"
+            className="
+              w-8 h-8 flex items-center justify-center rounded-lg
+              bg-white/5 border border-white/8
+              text-[#9B978D] hover:text-[#C9A84C] hover:border-[#C9A84C]/30
+              text-sm transition-all duration-150
+            "
           >
             ✕
           </button>
         </div>
 
-        {/* Language Selection */}
-        <div className="px-5 py-2 bg-[#111114]">
-          <div className="flex p-1 rounded-xl bg-black/40 border border-white/5">
-            <button className="flex-1 py-2 text-xs rounded-lg bg-[#C9A84C] text-black font-bold">
-              EN
-            </button>
-            <button className="flex-1 py-2 text-xs rounded-lg text-[#9B978D]">
-              বাং
-            </button>
+        {/* Language toggle */}
+        <div className="px-4 pt-4 pb-3 border-b border-white/6 shrink-0">
+          <p className="text-[9px] uppercase tracking-[0.15em] text-[#5A574F] mb-2">
+            Language
+          </p>
+          <div className="flex p-0.5 gap-0.5 rounded-lg bg-black/40 border border-white/6">
+            {LANGUAGES.map(({ code, label }) => (
+              <button
+                key={code}
+                onClick={() => handleLang(code)}
+                className={`
+                  flex-1 py-2 text-xs font-medium rounded-md transition-all duration-200
+                  ${
+                    activeLang === code
+                      ? "bg-[#C9A84C] text-[#0A0A0B] font-bold"
+                      : "text-[#9B978D] hover:text-[#F0EDE6]"
+                  }
+                `}
+              >
+                {label}
+              </button>
+            ))}
           </div>
         </div>
 
-        {/* Nav Links */}
-        <nav className="flex-1 px-3 py-6 overflow-y-auto bg-[#111114]">
-          <p className="px-4 text-[10px] uppercase tracking-widest text-[#5A574F] mb-4">
+        {/* Nav items */}
+        <nav className="flex-1 px-3 py-4 overflow-y-auto">
+          <p className="px-4 text-[9px] uppercase tracking-[0.15em] text-[#5A574F] mb-3">
             Browse
           </p>
-          <ul className="space-y-2">
-            {NAV_ITEMS.map(({ key, icon, label }) => (
-              <li key={key}>
-                <button className="flex items-center gap-4 w-full px-4 py-2 rounded-xl text-[#9B978D] hover:bg-white/5 hover:text-[#C9A84C] transition-all">
-                  <span className="text-lg">{icon}</span>
-                  <span className="text-sm font-medium">{label}</span>
-                </button>
-              </li>
-            ))}
+          <ul className="space-y-1">
+            {NAV_ITEMS.map(({ key, icon, label, filter }) => {
+              const isActive = activeFilter === filter;
+              return (
+                <li key={key}>
+                  <button
+                    onClick={() => handleFilter(filter)}
+                    className={`
+                      flex items-center gap-3 w-full
+                      px-4 py-3 rounded-lg text-sm font-medium
+                      border transition-all duration-200
+                      ${
+                        isActive
+                          ? "bg-[#C9A84C]/10 border-[#C9A84C]/30 text-[#C9A84C]"
+                          : "border-transparent text-[#9B978D] hover:bg-white/5 hover:text-[#F0EDE6]"
+                      }
+                    `}
+                  >
+                    <span
+                      className={`w-4 shrink-0 text-center text-sm leading-none ${isActive ? "text-[#C9A84C]" : "text-[#5A574F]"}`}
+                    >
+                      {icon}
+                    </span>
+                    <span>{dictionary?.[key] ?? label}</span>
+                    {isActive && (
+                      <span className="ml-auto w-1.5 h-1.5 rounded-full bg-[#C9A84C]" />
+                    )}
+                  </button>
+                </li>
+              );
+            })}
           </ul>
         </nav>
       </aside>
