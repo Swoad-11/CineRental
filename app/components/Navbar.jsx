@@ -1,11 +1,12 @@
 import Image from "next/image";
-import logo from "@/public/logo.svg";
+import logo from "/public/logo.svg";
 import Link from "next/link";
 import LanguageSwitcher from "./LanguageSwitcher";
 
 /**
  * Navbar Component
- * @param {ReactNode} mobileTrigger - The button that opens the mobile drawer
+ * @param {Object} props
+ * @param {React.ReactNode} props.mobileTrigger - The button that opens the mobile drawer
  */
 const Navbar = ({ mobileTrigger }) => {
   return (
@@ -36,18 +37,15 @@ const Navbar = ({ mobileTrigger }) => {
 
         {/* --- RIGHT SIDE: Desktop Actions + Mobile Hamburger --- */}
         <div className="flex items-center gap-2">
-          {/* Desktop-Only Items (hidden below lg breakpoint) */}
+          {/* Desktop-Only Items (Hidden on mobile) */}
           <ul className="hidden lg:flex items-center gap-2">
-            <li aria-hidden className="w-px h-5 bg-white/6 mx-1" />
-
-            {/* Language Selection */}
             <li>
               <LanguageSwitcher />
             </li>
           </ul>
 
-          {/* --- MOBILE TRIGGER (Hamburger) --- */}
-          {/* This sits on the far right on mobile/tablet and hides on desktop */}
+          {/* --- MOBILE TRIGGER (Hamburger SVG) --- */}
+          {/* Only visible on mobile/tablet (lg:hidden) */}
           <div className="lg:hidden flex items-center">{mobileTrigger}</div>
         </div>
       </nav>

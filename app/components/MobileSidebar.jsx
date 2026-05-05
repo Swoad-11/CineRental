@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useTheme } from "next-themes";
 import { useRouter, usePathname } from "next/navigation";
 import Image from "next/image";
-import logo from "@/public/logo.svg";
+import logo from "/public/logo.svg";
 
 const NAV_ITEMS = [
   { key: "trending", icon: "↑", label: "Trending" },
