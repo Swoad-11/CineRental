@@ -11,7 +11,7 @@ const MovieDetailsPage = async ({ params: { id, lang } }) => {
   }
 
   return (
-    <body className="dark:bg-body bg-white font-[Sora] dark:text-white text-dark">
+    <div className="dark:bg-body bg-white font-[Sora] dark:text-white text-dark min-h-screen">
       <Navbar />
       <main>
         <div className="container grid lg:grid-cols-[218px_1fr] gap-[3.5rem]">
@@ -19,7 +19,7 @@ const MovieDetailsPage = async ({ params: { id, lang } }) => {
           <MovieDetails id={id} lang={lang} />
         </div>
       </main>
-    </body>
+    </div>
   );
 };
 
